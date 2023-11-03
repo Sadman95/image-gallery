@@ -5,11 +5,15 @@
 
 	color-scheme: light dark;
 	color: #000;
-	background-color: #eaeef3 !important;
+	background-color: #eaeef3;
 
 	font-synthesis: none;
 	text-rendering: optimizeLegibility;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 	-webkit-text-size-adjust: 100%;
+}
+
+body {
+	background-color: transparent !important;
 }

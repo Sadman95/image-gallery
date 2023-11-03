@@ -13,7 +13,11 @@ const App = () => {
 			.catch((err) => console.log(err));
 	}, []);
 
-	return <div>{images.length && <Gallery images={images} />}</div>;
+	return (
+		<div>
+			{images.length && <Gallery images={images} setImages={setImages} />}
+		</div>
+	);
 };
 
 export default App;
