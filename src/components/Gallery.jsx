@@ -1,7 +1,9 @@
 import PropTypes from "prop-types";
-import { Button, Col, Container, Form, Image, Row } from "react-bootstrap";
+import { Button, Container, Form, Image } from "react-bootstrap";
 import "../styles/gallery.module.css";
 import { useEffect, useState } from "react";
+import { DragDropContext, Draggable } from "react-beautiful-dnd";
+import { StrictModeDroppable as Droppable } from "../helpers/StrictModeDropable";
 
 const Gallery = ({ images, setImages }) => {
 	const [selected, setSelected] = useState([]);
@@ -25,8 +27,21 @@ const Gallery = ({ images, setImages }) => {
 		console.log(selected);
 	}, [selected]);
 
+	// drag handler
+	const handleOnDragEnd = (result) => {
+		if (!result.destination) return;
+
+		const data = [...images];
+
+		const [reorderedData] = data.splice(result.source.index, 1);
+
+		data.splice(result.destination.index, 0, reorderedData);
+
+		setImages(data);
+	};
+
 	return (
-		<Container fluid>
+		<Container>
 			<h1>Gallery</h1>
 			{selected.length > 0 && (
 				<div className="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between">
@@ -48,35 +63,49 @@ const Gallery = ({ images, setImages }) => {
 				</div>
 			)}
 			<hr />
-			<Row>
-				{images.map(({ id, url }, indx) => (
-					<Col
-						className={`position-relative p-2`}
-						xs={12}
-						sm={6}
-						md={{ span: indx == 0 ? 4 : 2 }}
-						key={id}
-					>
-						<label style={{ cursor: "pointer" }} htmlFor={`img-${id}`}>
-							<Image
-								className="bg-light border border-secondary-subtle border-1 rounded"
-								fluid
-								src={url}
-								alt={`img-${id}`}
-							/>
-						</label>
-						<Form.Check
-							checked={selected.includes(id)}
-							onChange={(e) => handleChangeImage(e.currentTarget)}
-							className="position-absolute top-0 start-0 pt-3 ps-5"
-							type="checkbox"
-							id={`img-${id}`}
-							value={id}
-							label={`img-${id}`}
-						/>
-					</Col>
-				))}
-			</Row>
+			<DragDropContext onDragEnd={handleOnDragEnd}>
+				<Droppable droppableId="gallery-dropzone" direction="horizontal">
+					{(provided) => (
+						<div
+							{...provided.droppableProps}
+							ref={provided.innerRef}
+							id="gallery-dropzone"
+							className="d-flex align-items-start"
+						>
+							{images.map(({ id, url }, indx) => (
+								<Draggable key={id} draggableId={id.toString()} index={indx}>
+									{(provided) => (
+										<div
+											className={`position-relative p-2`}
+											ref={provided.innerRef}
+											{...provided.draggableProps}
+											{...provided.dragHandleProps}
+										>
+											<Image
+												height={indx == 0 ? 200 : 100}
+												width={indx == 0 ? 200 : 100}
+												fluid
+												className="bg-light border border-secondary-subtle border-1 rounded"
+												src={url}
+												alt={`img-${id}`}
+											/>
+											<Form.Check
+												checked={selected.includes(id)}
+												onChange={(e) => handleChangeImage(e.currentTarget)}
+												className="position-absolute top-0 start-0 pt-3 ps-3"
+												type="checkbox"
+												id={`img-${id}`}
+												value={id}
+											/>
+										</div>
+									)}
+								</Draggable>
+							))}
+							{provided.placeholder}
+						</div>
+					)}
+				</Droppable>
+			</DragDropContext>
 		</Container>
 	);
 };
