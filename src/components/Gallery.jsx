@@ -1,44 +1,40 @@
+import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import { Button, Container, Form, Image } from "react-bootstrap";
-import "../styles/gallery.module.css";
-import { useEffect, useState } from "react";
 import { DragDropContext, Draggable } from "react-beautiful-dnd";
 import { StrictModeDroppable as Droppable } from "../helpers/StrictModeDropable";
+import "../styles/gallery.css";
 
 const Gallery = ({ images, setImages }) => {
 	const [selected, setSelected] = useState([]);
 
-	// checkbox change handler
 	const handleChangeImage = (target) => {
-		if (target.checked) setSelected((prev) => [...prev, target.value]);
-		else setSelected(selected.filter((value) => value !== target.value));
+		setSelected((prev) =>
+			target.checked
+				? [...prev, target.value]
+				: prev.filter((value) => value !== target.value)
+		);
 	};
 
-	// delete selected images handler
 	const handleDeleteImage = () => {
-		const data = JSON.parse(localStorage.getItem("images"));
-		const filteredImages = data.filter((img) => !selected.includes(img.id));
-		localStorage.setItem("images", JSON.stringify(filteredImages));
+		const filteredImages = images.filter((img) => !selected.includes(img.id));
 		setImages(filteredImages);
 		setSelected([]);
+	};
+
+	const handleOnDragEnd = (result) => {
+		if (!result.destination) return;
+
+		const data = [...images];
+		const [reorderedData] = data.splice(result.source.index, 1);
+		data.splice(result.destination.index, 0, reorderedData);
+
+		setImages(data);
 	};
 
 	useEffect(() => {
 		console.log(selected);
 	}, [selected]);
-
-	// drag handler
-	const handleOnDragEnd = (result) => {
-		if (!result.destination) return;
-
-		const data = [...images];
-
-		const [reorderedData] = data.splice(result.source.index, 1);
-
-		data.splice(result.destination.index, 0, reorderedData);
-
-		setImages(data);
-	};
 
 	return (
 		<Container>
@@ -54,7 +50,7 @@ const Gallery = ({ images, setImages }) => {
 						} selected`}
 					/>
 					<Button
-						onClick={() => handleDeleteImage()}
+						onClick={handleDeleteImage}
 						className="text-danger text-decoration-none"
 						variant="link"
 					>
@@ -70,22 +66,20 @@ const Gallery = ({ images, setImages }) => {
 							{...provided.droppableProps}
 							ref={provided.innerRef}
 							id="gallery-dropzone"
-							className="d-flex align-items-start"
+							className="container-fluid"
 						>
 							{images.map(({ id, url }, indx) => (
 								<Draggable key={id} draggableId={id.toString()} index={indx}>
 									{(provided) => (
 										<div
-											className={`position-relative p-2`}
+											className={`img-container border border-secondary-subtle border-1 rounded position-relative float-start`}
 											ref={provided.innerRef}
 											{...provided.draggableProps}
 											{...provided.dragHandleProps}
 										>
 											<Image
-												height={indx == 0 ? 200 : 100}
-												width={indx == 0 ? 200 : 100}
-												fluid
-												className="bg-light border border-secondary-subtle border-1 rounded"
+												height={indx == 0 ? 400 : 200}
+												width={indx == 0 ? 400 : 200}
 												src={url}
 												alt={`img-${id}`}
 											/>
