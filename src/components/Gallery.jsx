@@ -8,6 +8,7 @@ import "../styles/gallery.css";
 const Gallery = ({ images, setImages }) => {
 	const [selected, setSelected] = useState([]);
 
+	//selected images change handler
 	const handleChangeImage = (target) => {
 		setSelected((prev) =>
 			target.checked
@@ -16,12 +17,14 @@ const Gallery = ({ images, setImages }) => {
 		);
 	};
 
+	//selected images delete handler
 	const handleDeleteImage = () => {
 		const filteredImages = images.filter((img) => !selected.includes(img.id));
 		setImages(filteredImages);
 		setSelected([]);
 	};
 
+	//on-drag end handler
 	const handleOnDragEnd = (result) => {
 		if (!result.destination) return;
 

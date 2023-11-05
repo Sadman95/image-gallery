@@ -5,6 +5,7 @@ import Gallery from "./components/Gallery";
 const App = () => {
 	const [images, setImages] = useState([]);
 
+	//fetch from json data & set to localstorage
 	useEffect(() => {
 		fetch("./data.json")
 			.then((data) => data.json())
