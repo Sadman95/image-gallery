@@ -54,7 +54,7 @@ const Gallery = ({ images, setImages }) => {
 					/>
 					<Button
 						onClick={handleDeleteImage}
-						className="text-danger text-decoration-none"
+						className="fw-bold text-danger text-decoration-none"
 						variant="link"
 					>
 						Delete selected
